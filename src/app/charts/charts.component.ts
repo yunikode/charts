@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import * as pattern from 'patternomaly';
 import { UIChart } from 'primeng-lts/chart';
 
 @Component({
@@ -48,7 +49,7 @@ export class ChartsComponent implements OnInit {
         {
           label: 'HT',
           unit: this.units,
-          backgroundColor: '#42A5F5',
+          backgroundColor: pattern.draw('zigzag', '#17becf'),
           data: [50, 25, 12, 48, 90, 76, 42],
           datalabels: {
             align: 'center',
@@ -58,7 +59,7 @@ export class ChartsComponent implements OnInit {
         {
           label: 'NT',
           unit: this.units,
-          backgroundColor: '#66BB6A',
+          backgroundColor: pattern.draw('diamond-box', '#ff7f0e'),
           data: [21, 84, 24, 75, 37, 65, 34],
           datalabels: {
             align: 'center',
@@ -72,6 +73,9 @@ export class ChartsComponent implements OnInit {
       tooltips: {
         mode: 'index',
         intersect: false,
+        titleFontSize: 16,
+        bodyFontSize: 16,
+        footerFontSize: 16,
         callbacks: {
           label: function (item) {
             if (this._chart.config.type === 'bar') {
@@ -112,9 +116,10 @@ export class ChartsComponent implements OnInit {
                 : context.dataset.unit
             }`;
           },
-          color: 'white',
+          color: 'black',
           font: {
             weight: 'bold',
+            size: '16',
           },
         },
       },
