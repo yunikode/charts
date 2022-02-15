@@ -18,17 +18,23 @@ export class ChartsComponent implements OnInit {
 
   type: string;
 
+  resizeTimer: any;
   @Input()
   units: string;
 
   constructor() {}
 
-  onResize(event) {
-    event.target.innerWidth > 800
-      ? (this.type = 'bar')
-      : (this.type = 'horizontalBar');
+  onResize() {
+    const chart = this.chart;
 
-    this.chart.reinit();
+    clearTimeout(this.resizeTimer);
+    this.resizeTimer = setTimeout(function () {
+      window.innerWidth > 800
+        ? (this.type = 'bar')
+        : (this.type = 'horizontalBar');
+      chart.type = this.type;
+      chart.reinit();
+    }, 250);
   }
 
   ngOnInit(): void {
@@ -41,6 +47,7 @@ export class ChartsComponent implements OnInit {
       datasets: [
         {
           label: 'HT',
+          unit: this.units,
           backgroundColor: '#42A5F5',
           data: [50, 25, 12, 48, 90, 76, 42],
           datalabels: {
@@ -50,6 +57,7 @@ export class ChartsComponent implements OnInit {
         },
         {
           label: 'NT',
+          unit: this.units,
           backgroundColor: '#66BB6A',
           data: [21, 84, 24, 75, 37, 65, 34],
           datalabels: {
@@ -67,9 +75,17 @@ export class ChartsComponent implements OnInit {
         callbacks: {
           label: function (item) {
             if (this._chart.config.type === 'bar') {
-              return `${item.yLabel} Test`;
+              return `${item.yLabel} ${
+                this._data.datasets[item.datasetIndex].unit === 'm3'
+                  ? 'm' + String.fromCharCode(179)
+                  : this._data.datasets[item.datasetIndex].unit
+              }`;
             } else {
-              return `${item.xLabel} Test`;
+              return `${item.xLabel} ${
+                this._data.datasets[item.datasetIndex].unit === 'm3'
+                  ? 'm' + String.fromCharCode(179)
+                  : this._data.datasets[item.datasetIndex].unit
+              }`;
             }
           },
           footer: function (items) {
@@ -79,14 +95,22 @@ export class ChartsComponent implements OnInit {
             } else {
               _sum = items.reduce((a, b) => a + b.xLabel, 0);
             }
-            return 'Total: ' + _sum;
+            return `Gesamt: ${_sum} ${
+              this._data.datasets[0].unit === 'm3'
+                ? 'm' + String.fromCharCode(179)
+                : this._data.datasets[0].unit
+            }`;
           },
         },
       },
       plugins: {
         datalabels: {
-          formatter: function (value) {
-            return `${value}`;
+          formatter: function (value, context) {
+            return `${value} ${
+              context.dataset.unit === 'm3'
+                ? 'm' + String.fromCharCode(179)
+                : context.dataset.unit
+            }`;
           },
           color: 'white',
           font: {
@@ -94,7 +118,6 @@ export class ChartsComponent implements OnInit {
           },
         },
       },
-
       responsive: true,
       scales: {
         xAxes: [
